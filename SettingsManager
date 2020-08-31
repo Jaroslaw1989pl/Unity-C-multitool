@@ -1,0 +1,69 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System.IO;
+using UnityEngine.UI;
+using System.CodeDom.Compiler;
+//using System.Diagnostics;
+
+public class SettingsManager : MonoBehaviour
+{
+
+    public GameObject settings_lang_dropdown;
+    Dropdown lang_drop;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        lang_drop = settings_lang_dropdown.GetComponent<Dropdown>();
+
+        //Sprawdza czy istnieje plik z zapisem: jesli nie ustawia język zgodny z jezykiem urządzenia, jesli tak wczytuje jezyk
+        if (File.Exists(Application.persistentDataPath + "/save.txt") == false) lang_drop.value = DefaultLanguage(); 
+        else Load();
+    }
+
+    // Update is called once per frame
+    public void SaveSettingsFunction()
+    {
+        //SAVE - zapis wywolany zmianą języka
+        //lang_drop.onValueChanged.AddListener(delegate
+        //{
+            SaveSettings saveSettings = new SaveSettings
+            {
+                language_dropdown_value = lang_drop.value
+            };
+            string json = JsonUtility.ToJson(saveSettings); //Konweruje zapisaną wartość na format json
+            File.WriteAllText(Application.persistentDataPath + "/save.txt", json); //Tworzy plik/zapisuje do pliku 
+            //Debug.Log(lang_drop.options[lang_drop.value].text = "Jarek");
+        //});
+    }
+
+    private void Load()
+    {
+        string saveString = File.ReadAllText(Application.persistentDataPath + "/save.txt"); //Odzczytuje z pliku zapisaną wrtość
+        SaveSettings saveSettings = JsonUtility.FromJson<SaveSettings>(saveString); //Przypisuje zapisaną wartość do zmiennej w klasie SaveSettings
+        lang_drop.value = saveSettings.language_dropdown_value; //Przypisuje zmienną z klasy SaveSettings do warości dropdown
+        Debug.Log(saveString);
+    }
+
+    public int DefaultLanguage()
+    {
+        if (Application.systemLanguage == SystemLanguage.English) return 0;
+        if (Application.systemLanguage == SystemLanguage.Arabic) return 1;
+        if (Application.systemLanguage == SystemLanguage.ChineseSimplified || Application.systemLanguage == SystemLanguage.ChineseTraditional
+            || Application.systemLanguage == SystemLanguage.Chinese) return 2;
+        if (Application.systemLanguage == SystemLanguage.French) return 3;
+        if (Application.systemLanguage == SystemLanguage.Hebrew) return 4;
+        if (Application.systemLanguage == SystemLanguage.Spanish) return 5;
+        if (Application.systemLanguage == SystemLanguage.German) return 6;
+        if (Application.systemLanguage == SystemLanguage.Polish) return 7;
+        if (Application.systemLanguage == SystemLanguage.Russian) return 8;
+        if (Application.systemLanguage == SystemLanguage.Turkish) return 9;
+        else return 0;
+    }
+
+    private class SaveSettings
+    {
+        public int language_dropdown_value;
+    }
+}
