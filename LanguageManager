@@ -1,0 +1,101 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using System.IO;
+using System;
+using System.Runtime.Versioning;
+
+public class LanguageManager : MonoBehaviour
+{
+    public string key;
+
+    public GameObject settings_lang_dropdown;
+    Dropdown lang_drop;
+    
+    //Text file names
+    public string en;
+    //public string sa;
+    //public string cn;
+    //public string fr;
+    //public string il;
+    //public string es;
+    //public string de;
+    public string pl;
+    //public string ru;
+    //public string tr;
+
+    private Dictionary<string, string> items = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);     
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        lang_drop = settings_lang_dropdown.GetComponent<Dropdown>();
+        Text tekst = GetComponent<Text>();
+
+        var text_asset = Resources.Load<TextAsset>(LanguageFromDropdown());
+        var text_objects = JsonUtility.FromJson<LanguageTextFile>(text_asset.text);
+
+        foreach(var t in text_objects.items)
+        {
+            items[t.key] = t.value;
+        }
+
+        tekst.text = GetText(key);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+        //lang_drop.onValueChanged.AddListener(delegate
+        //{
+            Text tekst = GetComponent<Text>();
+
+            var text_asset = Resources.Load<TextAsset>(LanguageFromDropdown());
+            var text_objects = JsonUtility.FromJson<LanguageTextFile>(text_asset.text);
+
+            foreach (var t in text_objects.items)
+            {
+                items[t.key] = t.value;
+            }
+
+            tekst.text = GetText(key);
+        //});
+    }
+
+    public string GetText(string text_key)
+    {
+        string tmp = "";
+        if (items.TryGetValue(text_key, out tmp)) return tmp;
+        return string.Empty;
+    }
+
+    string LanguageFromDropdown()
+    {
+        if (lang_drop.value == 0) return en;
+        //else if (lang_drop.value == 1) return sa;
+        //else if (lang_drop.value == 2) return cn;
+        //else if (lang_drop.value == 3) return fr;
+        //else if (lang_drop.value == 4) return il;
+        //else if (lang_drop.value == 5) return es;
+        //else if (lang_drop.value == 6) return de;
+        else if (lang_drop.value == 7) return pl;
+        //else if (lang_drop.value == 8) return ru;
+        //else if (lang_drop.value == 9) return tr;
+        else return en;
+    }
+
+    [Serializable]
+    public class LanguageKeysAndValues
+    {
+        public string key;
+        public string value;
+    }
+
+    [Serializable]
+    public class LanguageTextFile
+    {
+        public LanguageKeysAndValues[] items;
+    }
+}
